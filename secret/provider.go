@@ -1,17 +1,44 @@
 package secret
 
 import (
-	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
-	"github.com/hashicorp/terraform-plugin-sdk/terraform"
+	"context"
+
+	"github.com/hashicorp/terraform-plugin-framework/datasource"
+	"github.com/hashicorp/terraform-plugin-framework/provider"
+	"github.com/hashicorp/terraform-plugin-framework/resource"
 )
 
-// Provider returns a terraform.ResourceProvider.
-func Provider() terraform.ResourceProvider {
-	return &schema.Provider{
-		Schema: map[string]*schema.Schema{},
+type SecretProvider struct {
+	version string
+}
 
-		ResourcesMap: map[string]*schema.Resource{
-			"secret_resource": resource(),
+func (p *SecretProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
+	resp.TypeName = "secret"
+	resp.Version = p.version
+}
+
+func (p *SecretProvider) Schema(context.Context, provider.SchemaRequest, *provider.SchemaResponse) {
+}
+
+func (p *SecretProvider) Configure(context.Context, provider.ConfigureRequest, *provider.ConfigureResponse) {
+}
+
+func (p *SecretProvider) Resources(ctx context.Context) []func() resource.Resource {
+	return []func() resource.Resource{
+		func() resource.Resource {
+			return &SecretResource{}
 		},
+	}
+}
+
+func (p *SecretProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
+	return []func() datasource.DataSource{}
+}
+
+func New(version string) func() provider.Provider {
+	return func() provider.Provider {
+		return &SecretProvider{
+			version,
+		}
 	}
 }

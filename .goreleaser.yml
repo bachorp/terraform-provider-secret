@@ -1,47 +1,58 @@
----
+version: 2
 env:
-- CGO_ENABLED=0
-
-before:
-  hooks:
-  - go mod download
+  - CGO_ENABLED=0
 
 builds:
-- binary: "{{ .ProjectName }}_v{{ .Version }}"
-  targets:
-  - darwin_amd64
-  - darwin_arm64
-  - linux_amd64
-  - linux_arm64
-  - linux_arm_7
-  - windows_amd64
+  - binary: "{{ .ProjectName }}_v{{ .Version }}"
+    mod_timestamp: "{{ .CommitTimestamp }}"
+    flags:
+      - -trimpath
+
+    ldflags:
+      - "-s -w -X main.version={{.Version}}"
+
+    goos:
+      - darwin
+      - freebsd
+      - linux
+      - windows
+
+    goarch:
+      - "386"
+      - amd64
+      - arm
+      - arm64
+
+    ignore:
+      - goos: darwin
+        goarch: "386"
 
 archives:
-- format: zip
-  name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+  - format: zip
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
 
 checksum:
   name_template: "{{ .ProjectName }}_{{ .Version }}_SHA256SUMS"
   algorithm: sha256
   extra_files:
-  - glob: terraform-registry-manifest.json
-    name_template: "{{ .ProjectName }}_{{ .Version }}_manifest.json"
+    - glob: terraform-registry-manifest.json
+      name_template: "{{ .ProjectName }}_{{ .Version }}_manifest.json"
 
 signs:
-- artifacts: checksum
-  args:
-  - "--batch"
-  - "--local-user"
-  - "{{ .Env.GPG_FINGERPRINT }}"
-  - "--output"
-  - "${signature}"
-  - "--detach-sign"
-  - "${artifact}"
+  - artifacts: checksum
+    args:
+      - "--batch"
+      - "--local-user"
+      - "{{ .Env.GPG_FINGERPRINT }}"
+      - "--output"
+      - "${signature}"
+      - "--detach-sign"
+      - "${artifact}"
 
 release:
   extra_files:
-  - glob: terraform-registry-manifest.json
-    name_template: "{{ .ProjectName }}_{{ .Version }}_manifest.json"
+    - glob: terraform-registry-manifest.json
+      name_template: "{{ .ProjectName }}_{{ .Version }}_manifest.json"
 
 changelog:
-  skip: true
+  disable: true

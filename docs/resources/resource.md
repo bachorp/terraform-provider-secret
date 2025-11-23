@@ -1,25 +1,19 @@
-# `secret_resource` Resource
+# `secret_resource` (Resource)
 
-This is a special resource that can only be created on "import".
+Wraps a secret.
+Can only be created using `import`.
 
-## Example Usage
+## Example
 
-```hcl
-resource "secret_resource" "my_api_key" {
-  lifecycle { prevent_destroy = true }
+```tf
+resource "secret_resource" "api_key" {}
+
+import {
+    to = secret_resource.api_key
+    id = <MY_API_KEY>
 }
 ```
 
-Then import the secret:
-
-`terraform import secret_resource my_api_key "dfgdsgdsfgsdfgfd"`
-
-To cycle a secret, use `terraform state rm` to forget the previous value.
-
-## Argument Reference
-
-None
-
 ## Attribute Reference
 
-* `value` - (Computed, Sensitive) The stored secret
+- `value` - (Computed, Sensitive) The contained secret
