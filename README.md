@@ -1,5 +1,8 @@
 # Terraform/OpenTofu Provider `secret`
 
+[![](https://img.shields.io/badge/-OpenTofu-FFDA18?style=for-the-badge&logo=opentofu&logoColor=black)](https://search.opentofu.org/provider/bachorp/secret)
+[![](https://img.shields.io/badge/-Terraform-844FBA?style=for-the-badge&logo=terraform&logoColor=white)](https://registry.terraform.io/providers/bachorp/secret)
+
 This provider allows to store sensitive data in the state using a wrapper resource.
 
 This is a pragmatic approach in case another secret management solution isn't readily available and assuming that the state is handled accordingly securely (!).
@@ -44,7 +47,7 @@ import {
 }
 ```
 
-4. Use the secret value:
+#### 4. Use the secret value:
 
 ```tf
 output "api_key" {

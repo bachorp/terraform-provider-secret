@@ -44,7 +44,7 @@ import {
 }
 ```
 
-4. Use the secret value:
+#### 4. Use the secret value:
 
 ```tf
 output "api_key" {
