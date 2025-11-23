@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.1.0
+
+- Fix Markdown formatting
+
 ## v2.0.0
 
 - Raise an error if planning is attempted for a `secret_resource` with missing `value`
