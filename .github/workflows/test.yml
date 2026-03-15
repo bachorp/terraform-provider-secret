@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        terraform:
+        version:
           - "1.13"
           - "1.14"
 
@@ -19,12 +19,46 @@ jobs:
 
       - uses: hashicorp/setup-terraform@5e8dbf3c6d9deaf4193ca7a8fb23f2ac83bb6c85 # v4.0.0
         with:
-          terraform_version: ${{ matrix.terraform }}
+          terraform_version: ${{ matrix.version }}
           terraform_wrapper: false
 
       - run: go build -v
       - run: go test -v ./...
         env:
           TF_ACC: "1"
+
+      - uses: golangci/golangci-lint-action@1e7e51e771db61008b38414a730f564565cf7c20 # v9.2.0
+
+  opentofu:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version:
+          - "1.9"
+          - "1.10"
+          - "1.11"
+
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.2
+      - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
+        with:
+          go-version-file: go.mod
+
+      - uses: opentofu/setup-opentofu@9d84900f3238fab8cd84ce47d658d25dd008be2f # v1.0.8
+        with:
+          tofu_version: ${{ matrix.version }}
+          tofu_wrapper: false
+
+      - id: tofu_path
+        run: echo value="$(which tofu)" >> "${GITHUB_OUTPUT}"
+
+      - run: go build -v
+      - run: go test -v ./...
+        env:
+          TF_ACC: "1"
+          # https://opentofu.org/docs/language/providers/#running-acceptance-tests-with-opentofu-cli
+          TF_ACC_TERRAFORM_PATH: ${{ steps.tofu_path.outputs.value }}
+          TF_ACC_PROVIDER_NAMESPACE: hashicorp
+          TF_ACC_PROVIDER_HOST: registry.opentofu.org
 
       - uses: golangci/golangci-lint-action@1e7e51e771db61008b38414a730f564565cf7c20 # v9.2.0
